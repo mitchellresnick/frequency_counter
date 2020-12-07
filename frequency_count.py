@@ -91,10 +91,13 @@ def main():
         column_name = df[key].columns[value]
         for row in df[key][column_name].values:
             for word in row.split(' '):
-                try:
-                    wordFrequency[word] += 1
-                except KeyError:
-                    wordFrequency[word] = 1
+                if word == '':
+                    break
+                else:
+                    try:
+                        wordFrequency[word] += 1
+                    except KeyError:
+                        wordFrequency[word] = 1
         dataframe_append = DataFrame.from_dict(wordFrequency, orient='index')
         wordFrequencyDF = wordFrequencyDF.append(dataframe_append)
         with ExcelWriter(path.join(dir, f[file_index][:-5] + "_result.xlsx"), engine='openpyxl', mode='a') as writer:
