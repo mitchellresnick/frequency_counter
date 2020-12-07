@@ -84,9 +84,6 @@ def main():
     wordFrequency = {}
     wordFrequencyDF = DataFrame()
 
-    
-
-    # output = open(path.join(dir, f[file_index])[:-5] + "_result.xlsx", 'w')
     for (key, value) in worksheet_column_map.items():
         wordFrequency.clear()
         wordFrequencyDF = DataFrame()
@@ -103,26 +100,8 @@ def main():
         with ExcelWriter(f[file_index][:-5] + "_result.xlsx", engine='openpyxl', mode='a') as writer:
             wordFrequencyDF.to_excel(writer, sheet_name=key, header=False, startrow=0, startcol=0)
     
-    # output.close()
     workbook.close()
     
-    # # Have user identify what worksheet to analyze
-    # worksheet_input = None
-    # worksheets = list_worksheets(str(workbook.name))
-    # user_prompt = "Which worksheet would you like to analyze from the list above?: "
-    # worksheet_input = get_user_input(user_prompt, worksheet_input, worksheets, False)
-
-    # # Have user identify what column to analyze
-    # column_input = None
-    # column = list_columns(str(workbook.name), worksheets[worksheet_input])
-    # user_prompt = "Which column would you like to analyze from the list above?: "
-    # worksheet_input = get_user_input(user_prompt, worksheet_input, worksheets, False)
-
-    # Get header row from the file
-    # analysis_column = None
-    # column_prompt = "Please select the number of the column that you would like to analyze. Column headings are shown above."
-    # while analysis_column is None:
-    #     get_user_input(column_prompt, analysis_column, columns, False)
 
 if __name__ == "__main__":
     main()
