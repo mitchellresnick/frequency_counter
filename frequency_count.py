@@ -97,7 +97,7 @@ def main():
                     wordFrequency[word] = 1
         dataframe_append = DataFrame.from_dict(wordFrequency, orient='index')
         wordFrequencyDF = wordFrequencyDF.append(dataframe_append)
-        with ExcelWriter(f[file_index][:-5] + "_result.xlsx", engine='openpyxl', mode='a') as writer:
+        with ExcelWriter(path.join(dir, f[file_index][:-5] + "_result.xlsx"), engine='openpyxl', mode='a') as writer:
             wordFrequencyDF.to_excel(writer, sheet_name=key, header=False, startrow=0, startcol=0)
     
     workbook.close()
