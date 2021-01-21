@@ -3,6 +3,7 @@ import pathlib
 import sys
 from os import path, walk, execv
 from pandas import read_excel, DataFrame, ExcelWriter
+import math
 
 def get_user_input(prompt, storage_variable, list: list, display_help: bool):
     i = 0
@@ -63,7 +64,7 @@ def main():
     try:
         workbook = open(path.join(dir, f[file_index]), 'r')
     except PermissionError:
-        print("\n\n!!!!!!!!!\nUnable to access this file. Perhaps you already have it open? If so, close it before trying again.\n")
+        print("\n\n!!!!!!!!!\nUnable to access '%s' file. Perhaps you already have it open? If so, close it before trying again.\n!!!!!!!!!\n\n" % (str(f[file_index])))
         sys.exit()
     # Print file contents
     list_worksheets(str(workbook.name))
@@ -90,21 +91,32 @@ def main():
         # print(key, "\n--------")
         column_name = df[key].columns[value]
         for row in df[key][column_name].values:
-            for word in row.split(' '):
-                if word == '':
-                    break
-                else:
-                    try:
-                        wordFrequency[word] += 1
-                    except KeyError:
-                        wordFrequency[word] = 1
+            try:
+                for word in row.split(' '):
+                    if word == '':
+                        break
+                    else:
+                        try:
+                            wordFrequency[word] += 1
+                        except KeyError:
+                            wordFrequency[word] = 1
+            except AttributeError:
+                # this happens when there is a row without keywords. To generate this error, add a row to the top of the file and only fill in the first column and run the program
+                print("\n\n!!!!!!!!!!!!!!!\nEncountered a row without keywords. If this is not expected, please check the format of your file and correct any errors.\n!!!!!!!!!!!!!!!\n\n")
+                pass
         dataframe_append = DataFrame.from_dict(wordFrequency, orient='index')
         wordFrequencyDF = wordFrequencyDF.append(dataframe_append)
-        with ExcelWriter(path.join(dir, f[file_index][:-5] + "_result.xlsx"), engine='openpyxl', mode='a') as writer:
-            wordFrequencyDF.to_excel(writer, sheet_name=key, header=False, startrow=0, startcol=0)
-    
+        try:
+            with ExcelWriter(path.join(dir, f[file_index][:-5] + "_result.xlsx"), engine='openpyxl', mode='a') as writer:
+                wordFrequencyDF.to_excel(writer, sheet_name=key, header=False, startrow=0, startcol=0)
+        except FileNotFoundError:
+            print("A file with the name '%s' was not found. This program is unable to create the file. In order to fix this error, you must manually make a BLANK new Excel file with the name of '%s'. Once complete, please run the program again.\n" % ((str(f[file_index][:-5]) + "_result.xlsx"), (str(f[file_index][:-5]) + "_result.xlsx")))
+        except PermissionError:
+            print("\n\n!!!!!!!!!\nUnable to access '%s'. Perhaps you already have it open? If so, close it before trying again.\n!!!!!!!!!\n\n" % (str(f[file_index][:-5]) + "_result.xlsx"))
+            sys.exit()
     workbook.close()
-    
+    print("Program successfully completed. Please check '%s' for results." % (str(f[file_index][:-5]) + "_result.xlsx"))
+
 
 if __name__ == "__main__":
     main()
